@@ -1,0 +1,129 @@
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>typepki-asn1parse - v0.1.0</title><meta name="description" content="Documentation for typepki-asn1parse"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div><div class="field"><div id="tsd-toolbar-links"><a href="https://kjur.github.io/typepki-asn1parse/">Home</a><a href="https://github.com/kjur/typepki-asn1parse/issues">Issue</a><a href="https://github.com/kjur/typepki-asn1parse">GitHub</a><a href="https://kjur.github.io/typepki">TypePKI</a><a href="https://kjur.github.io/jsrsasign">jsrsasign</a></div></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">typepki-asn1parse - v0.1.0</a></div><div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h2>typepki-asn1parse - v0.1.0</h2></div><div class="tsd-panel tsd-typography"><a id="md:typepki-asn1parse-asn1-parser-utility-for-typepki-library" class="tsd-anchor"></a><h1><a href="#md:typepki-asn1parse-asn1-parser-utility-for-typepki-library">typepki-asn1parse: ASN.1 parser utility for TypePKI library</a></h1><p><a href="https://kjur.github.io/typepki-asn1parse/">TOP</a> | <a href="https://github.com/kjur/typepki-asn1parse">github</a> | <a href="https://www.npmjs.com/package/typepki-asn1parse">npm</a> | <a href="https://kjur.github.com/typepki/">TypePKI</a> </p>
+<p>The &#39;TypePKI&#39; library is an opensource free TypeScript PKI library which is the successor of the long lived <a href="https://kjur.github.io/jsrsasign">jsrsasign</a> library.</p>
+<p>The &#39;typepki-asn1parse&#39; is a ASN.1 parser utility for TypePKI library. </p>
+<a id="md:feature" class="tsd-anchor"></a><h2><a href="#md:feature">FEATURE</a></h2><ul>
+<li>ASN.1 DER parser for ASN.1 hexadecimal string (BER will also be in the future.)</li>
+<li>Dual CommonJS/ES module package supporting CommonJS(CJS) and ES modules</li>
+</ul>
+<a id="md:usage" class="tsd-anchor"></a><h2><a href="#md:usage">Usage</a></h2><pre><code class="language-JavaScript"><span class="hl-0">import</span><span class="hl-1"> { </span><span class="hl-2">asn1parse</span><span class="hl-1"> } </span><span class="hl-0">from</span><span class="hl-1"> </span><span class="hl-3">&quot;typepki-asn1parse&quot;</span><span class="hl-1">;</span><br/><span class="hl-2">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-4">asn1parse</span><span class="hl-1">(</span><span class="hl-3">&quot;300602010a02010b&quot;</span><span class="hl-1">));</span>
+</code><button>Copy</button></pre>
+<p>This shows</p>
+<pre><code><span class="hl-1">{</span><br/><span class="hl-1">  </span><span class="hl-3">&quot;t&quot;</span><span class="hl-1">: </span><span class="hl-3">&quot;seq&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-3">&quot;v&quot;</span><span class="hl-1">: [</span><br/><span class="hl-1">    { </span><span class="hl-3">&quot;t&quot;</span><span class="hl-2">:</span><span class="hl-1"> </span><span class="hl-3">&quot;int&quot;</span><span class="hl-1">, </span><span class="hl-3">&quot;v&quot;</span><span class="hl-2">:</span><span class="hl-1"> </span><span class="hl-3">&quot;0a&quot;</span><span class="hl-1"> },</span><br/><span class="hl-1">    { </span><span class="hl-3">&quot;t&quot;</span><span class="hl-2">:</span><span class="hl-1"> </span><span class="hl-3">&quot;int&quot;</span><span class="hl-1">, </span><span class="hl-3">&quot;v&quot;</span><span class="hl-2">:</span><span class="hl-1"> </span><span class="hl-3">&quot;0b&quot;</span><span class="hl-1"> },</span><br/><span class="hl-1">  ]</span><br/><span class="hl-1">}</span>
+</code><button>Copy</button></pre>
+<a id="md:parser-output" class="tsd-anchor"></a><h2><a href="#md:parser-output">Parser output</a></h2><p>Result will be a Record object which has following members:</p>
+<ul>
+<li>t - short ASN.1 tag name</li>
+<li>v - ASN.1 value</li>
+</ul>
+<a id="md:short-asn1-tag-name" class="tsd-anchor"></a><h2><a href="#md:short-asn1-tag-name">short ASN.1 tag name</a></h2><table>
+<thead>
+<tr>
+<th>short name</th>
+<th>ASN.1 name</th>
+<th>code</th>
+<th>value</th>
+<th>value sample</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bool</td>
+<td>INTEGER</td>
+<td>01</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td>INTEGER</td>
+<td>02</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>bitstr</td>
+<td>BitString</td>
+<td>03</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>octstr</td>
+<td>OctetString</td>
+<td>04</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>null</td>
+<td>NULL</td>
+<td>05</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>oid</td>
+<td>ObjectIdentifier</td>
+<td>06</td>
+<td></td>
+<td>{oid: &quot;0.2.3.15&quot;}</td>
+</tr>
+<tr>
+<td>enum</td>
+<td>Enumerated</td>
+<td>0a</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>utf8str</td>
+<td>UTF8String</td>
+<td>0c</td>
+<td></td>
+<td>{str: &quot;りんご3&quot;}</td>
+</tr>
+<tr>
+<td>prnstr</td>
+<td>PrintableString</td>
+<td>13</td>
+<td></td>
+<td>{str: &quot;test12&quot;}</td>
+</tr>
+<tr>
+<td>ia5str</td>
+<td>IA5String</td>
+<td>16</td>
+<td></td>
+<td>{str: &quot;<a href="mailto:u1@example.com">u1@example.com</a>&quot;}</td>
+</tr>
+<tr>
+<td>utctime</td>
+<td>UTCTime</td>
+<td>17</td>
+<td></td>
+<td>131231235959Z</td>
+</tr>
+<tr>
+<td>gentime</td>
+<td>GeneralizedTime</td>
+<td>18</td>
+<td></td>
+<td>20131231235959Z</td>
+</tr>
+<tr>
+<td>seq</td>
+<td>SEQUENCE</td>
+<td>30</td>
+<td>array of Record</td>
+<td>[{t:&quot;int&quot;,v:&quot;0123&quot;}]</td>
+</tr>
+<tr>
+<td>set</td>
+<td>SET</td>
+<td>31</td>
+<td>array of Record</td>
+<td>[{t:&quot;int&quot;,v:&quot;0123&quot;}]</td>
+</tr>
+</tbody></table>
+<a id="md:encapsulated" class="tsd-anchor"></a><h2><a href="#md:encapsulated">Encapsulated</a></h2><p>When the ASN.1 value is a ASN.1 TLV or a sequence of ASN.1 TLV, the V will also be parsed.</p>
+<p>This will be applied to ASN.1 application tag TLV such as &quot;[0]&quot; or &quot;[1]&quot;.</p>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-index-accordion"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><h4 class="uppercase">Member Visibility</h4><form><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></form></div><div class="tsd-theme-toggle"><h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#md:typepki-asn1parse-asn1-parser-utility-for-typepki-library"><span>typepki-<wbr/>asn1parse: ASN.1 parser utility for <wbr/>TypePKI library</span></a><ul><li><a href="#md:feature"><span>FEATURE</span></a></li><li><a href="#md:usage"><span>Usage</span></a></li><li><a href="#md:parser-output"><span>Parser output</span></a></li><li><a href="#md:short-asn1-tag-name"><span>short ASN.1 tag name</span></a></li><li><a href="#md:encapsulated"><span>Encapsulated</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="assets/icons.svg#icon-1"></use></svg><span>typepki-asn1parse - v0.1.0</span></a><ul class="tsd-small-nested-navigation" id="tsd-nav-container" data-base="."><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>

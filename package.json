@@ -1,0 +1,72 @@
+{
+  "name": "typepki-asn1parse",
+  "version": "0.1.0",
+  "author": "Kenji Urushima <kenji.urushima@gmail.com>",
+  "description": "ASN.1 parser utility for TypePKI library (beta)",
+  "homepage": "https://kjur.github.io/typepki-asn1parase",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kjur/typepki-asn1parase.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kjur/typepki-asn1parase/issues"
+  },
+  "keywords": [
+    "cryptography",
+    "webcryptoapi",
+    "publickey",
+    "hash",
+    "kdf",
+    "hmac"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "deploy": "",
+    "build": "run-z build:transpile,build:esm,build:cjs",
+    "build:transpile": "bun build.mts",
+    "build:esm": "tsc --project tsconfig.build.esm.json",
+    "build:cjs": "tsc --project tsconfig.build.cjs.json",
+    "check": "run-z check:type,check:static",
+    "check:type": "tsc --noEmit",
+    "check:static": "biome check .",
+    "fix": "$npm_execpath run check:static --apply-unsafe",
+    "test": "bun test",
+    "precommit": "run-z check:type fix test build",
+    "prepublish": "attw --pack .",
+    "run-z": "run-z",
+    "doc": "typedoc --includeVersion --cleanOutputDir false --tsconfig ./tsconfig.typedoc.json --options ./typedoc.json src/index.mts"
+  },
+  "files": [
+    "src",
+    "dist",
+    "package.json",
+    "tsconfig.json",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/import/index.d.mts",
+        "default": "./dist/import/index.mjs"
+      },
+      "require": {
+        "types": "./dist/require/index.d.cts",
+        "default": "./dist/require/index.cjs"
+      }
+    }
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.7.3",
+    "@tsconfig/node17": "^17.1.4",
+    "@types/bun": "^1.1.1",
+    "@types/node": "^17.0.45",
+    "esbuild": "^0.21.3",
+    "jest": "^29.7.0",
+    "run-z": "^2.0.0",
+    "typedoc": "^0.25.13",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "typepki-strconv": "^0.5.0"
+  }
+}

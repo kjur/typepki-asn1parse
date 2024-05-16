@@ -1,0 +1,21 @@
+{
+  "out": "./docs/",
+  "includes": "./src/",
+  "exclude": [
+    "./src/__tests__/*",
+    "**/__tests__/**/*",
+    "**/__test_utils__/**/*",
+    "**/__fixtures__/**/*",
+    "**/testsuite/**/*",
+    "./src/*.test.ts"
+  ],
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "navigationLinks": {
+    "Home": "https://kjur.github.io/typepki-asn1parse/",
+    "Issue": "https://github.com/kjur/typepki-asn1parse/issues",
+    "GitHub": "https://github.com/kjur/typepki-asn1parse",
+    "TypePKI": "https://kjur.github.io/typepki",
+    "jsrsasign": "https://kjur.github.io/jsrsasign"
+  }
+}
