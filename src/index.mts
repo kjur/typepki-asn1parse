@@ -1,4 +1,8 @@
 import { ishex, strpad, hextouricmp, hextoutf8 } from "typepki-strconv";
+import { OIDDataBase, OIDSET_CRYPTO, OIDSET_X509 } from "typepki-oiddb";
+
+const oiddb = OIDDataBase.instance;
+oiddb.regist([OIDSET_CRYPTO, OIDSET_X509]);
 
 /**
  * parse ASN.1 hexadecimal string
@@ -42,7 +46,6 @@ export function asn1parse(h: string): Record<string, any> {
     try {
       const oid = oidtoname(hextooid(value as string));
       value = { "oid": oid };
-      console.log("oid=", oid);
     } catch (ex) {
       value = { "hex": value };
     }
@@ -68,35 +71,8 @@ export function asn1parse(h: string): Record<string, any> {
   };
 }
 
-/*
- */
-
-const OIDDB: Record<string, string> = {
-  "1.2.840.10045.2.1": "ecPublicKey",
-  "1.2.840.10045.3.1.7": "prime256v1",
-  "1.2.840.113549.1.1.11": "sha256WithRSAEncryption",
-  "1.3.6.1.4.1.11129.2.4.2": "extendedValidationCertificates",
-  "1.3.6.1.5.5.7.1.1": "authorityInfoAccess",
-  "1.3.6.1.5.5.7.3.1": "serverAuth",
-  "1.3.6.1.5.5.7.3.2": "clientAuth",
-  "1.3.6.1.5.5.7.48.1": "ocsp",
-  "1.3.6.1.5.5.7.48.2": "caIssuers",
-  "2.23.140.1.2.1": "cabfBrDomainValidated",
-  "2.5.29.14": "subjectKeyIdentifier",
-  "2.5.29.15": "keyUsage",
-  "2.5.29.17": "subjectAltName",
-  "2.5.29.19": "basicConstraints",
-  "2.5.29.32": "certificatePolicies",
-  "2.5.29.35": "authorityKeyIdentifier",
-  "2.5.29.37": "extKeyUsage",
-  "2.5.4.10": "organizationName",
-  "2.5.4.3": "commonName",
-  "2.5.4.6": "countryName",
-};
-
-export function oidtoname(oid: string): string {
-  if (oid in OIDDB) return OIDDB[oid];
-  return oid;
+function oidtoname(oid: string): string {
+  return oiddb.oidtoname(oid);
 }
 
 export function taghextos(h: string): string {
@@ -218,6 +194,13 @@ export function isDER(h: string): boolean {
   }
 }
 
+/**
+ * convert hexadecimal ASN.1 ObjectIdentifier value to OID string
+ * @param h - hexadecimal ASN.1 ObjectIdentifier value
+ * @return OID string (ex. "1.2.3.4")
+ * @example
+ * hextooid("550406") -> "2.5.4.6"
+ */
 export function hextooid(h: string): string {
   if (!ishex(h)) throw new Error(`not hex: ${h}`);
   try {

@@ -1,10 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { asn1parse, getDERTLVList, getLh, getTLVh, getVh, getTh, hextooid, isDER, lenhextoint } from "./index.mts";
 
-test("asn1parse", () => {
-  expect(true).toBe(true);
-});
-
 test("getLh", () => {
   expect(getLh("020100", 0)).toBe("01");
   expect(getLh("02020000", 0)).toBe("02");
@@ -60,6 +56,9 @@ test("getDERTLVList", () => {
 
 test("asn1parse", () => {
   expect(asn1parse("020101")).toEqual({t:"int",v:"01"});
+  expect(asn1parse("06092a864886f70d01010b")).toEqual({t:"oid",v:{oid:"sha256WithRSAEncryption"}});
+  expect(asn1parse("13025553")).toEqual({t:"prnstr",v:{str:"US"}});
+  expect(asn1parse("170d3234303431313138303234345a")).toEqual({t:"utctime",v:"240411180244Z"});
   expect(asn1parse("300902010a02010b02010c")).toEqual({
     t: "seq",
     v: [
@@ -69,6 +68,7 @@ test("asn1parse", () => {
     ]
   });
   //expect(asn1parse(SSLLE1)).toEqual({t:"seq",v:"01"});
+  //expect(asn1parse("3081dc020101044201d924dcca0a887f8d99767a37d874e637a12ccb477d6e08665356694d68b7655e5069638fde7b45c854013dc77a35b18655b84c966a60220d40f91ed9f5145802eaa00706052b81040023a18189038186000401d0fd7257a84c747f562575c07385dbebf2f52bea58083db82fdd1531d8aae3cc875ff02ff7fa2da260d8eb62d6d2f5d649278e321736a0628cbbb30308b6e618db00f62ad204c6460359bc818ab8961bf0f0fc0ec5aae8a428173ce56f00de9b157c1e5c82c64f562fcadefc4a4c28f6d342cf3ef616fc82d33b7285c921f2bf36fdd8")).toEqual({t:"seq",v:"01"});
 });
 
 test("isDER", () => {

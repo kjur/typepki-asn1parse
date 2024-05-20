@@ -1,7 +1,7 @@
 typepki-asn1parse: ASN.1 parser utility for TypePKI library
 ===========================================================
 
-[TOP](https://kjur.github.io/typepki-asn1parse/) | [github](https://github.com/kjur/typepki-asn1parse) | [npm](https://www.npmjs.com/package/typepki-asn1parse) | [TypePKI](https://kjur.github.com/typepki/) 
+[TOP](https://kjur.github.io/typepki-asn1parse/) | [github](https://github.com/kjur/typepki-asn1parse) | [npm](https://www.npmjs.com/package/typepki-asn1parse) | [TypePKI](https://kjur.github.io/typepki/) 
 
 The 'TypePKI' library is an opensource free TypeScript PKI library which is the successor of the long lived [jsrsasign](https://kjur.github.io/jsrsasign) library.
 
