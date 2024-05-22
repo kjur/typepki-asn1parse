@@ -1,12 +1,12 @@
 {
   "name": "typepki-asn1parse",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "author": "Kenji Urushima <kenji.urushima@gmail.com>",
   "description": "ASN.1 parser utility for TypePKI library (beta)",
   "homepage": "https://kjur.github.io/typepki-asn1parse",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kjur/typepki-asn1parse.git"
+    "url": "git+https://github.com/kjur/typepki-asn1parse.git"
   },
   "bugs": {
     "url": "https://github.com/kjur/typepki-asn1parse/issues"

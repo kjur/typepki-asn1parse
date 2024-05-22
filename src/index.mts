@@ -237,3 +237,71 @@ export function hextooid(h: string): string {
     throw new Error(`malformed oid hex: ${h} ${ex}`);
   }
 }
+
+// == digging parsed ASN.1 ================================================
+
+/**
+ * get value from parsed ASN.1
+ * @param pASN - JSON object of parsed ASN.1 structure
+ * @param key - dot concatinated string of ASN.1 tag name or index of structured object
+ * @param defaultValue - default return value when ASN.1 item can't be found
+ * @return item identified by key. When item is not found, return defaultValue
+ * @describe
+ * This function will get an item refered by "key" in "pASN" which may be created
+ * by the function {@link asn1parse}.
+ * When the item identified by "key" isn't found, it returns undefined or "defaultValue".
+ * @example
+ * const parsedASN = {
+ *   t: "seq",
+ *   v: [
+ *     {t:"int", v:"01"},
+ *     {t:"seq", v:[{t:"utf8str", v:{str: "test"}}]}
+ *   ]
+ * };
+ * dig(parsedASN, "seq.0") -> {t:"int", v:"01"}
+ * dig(parsedASN, "seq.1.seq.0.utf8str") -> {str: "test"}
+ * dig(parsedASN, "utctime", null) -> null // not found
+ */
+export function dig(pASN: Record<string, any>, key: string, defaultValue?: any): string | Record<string, any> {
+  const aKey: string[] = key.split(".");
+  try {
+    return dig_value(pASN, aKey, defaultValue);
+  } catch (ex) {
+    //console.log(ex);
+    return defaultValue;
+  }
+}
+
+function dig_value(pASN: Record<string, any>, aKey: string[], defaultValue?: any): string | Record<string, any> | Record<string, any>[] {
+  if (aKey.length == 0) return pASN;
+  const key0: string | undefined = aKey.shift();
+  if (key0 === undefined) return defaultValue;
+  if (pASN.t !== key0) return defaultValue;
+  if (dig_isstructtag(key0)) return dig_list(pASN.v, aKey, defaultValue);
+  return pASN.v;
+}
+
+function dig_list(aASN: Record<string, any>[], aKey: string[], defaultValue?: any): string | Record<string, any> | Record<string, any>[] {
+  if (aKey.length == 0) return aASN;
+  const key0: string | undefined = aKey.shift();
+  if (key0 === undefined) return defaultValue;
+  try {
+    const ikey0 = parseInt(key0);
+    return dig_value(aASN[ikey0], aKey, defaultValue);
+  } catch (ex) {
+    //console.log(ex);
+  }
+  return defaultValue;
+}
+
+/*
+function dig_istag(key: string): boolean {
+  return true;
+}
+ */
+
+function dig_isstructtag(key: string): boolean {
+  if (["seq", "set"].includes(key)) return true;
+  if (key.slice(0, 1) === "a") return true;
+  return false;
+}

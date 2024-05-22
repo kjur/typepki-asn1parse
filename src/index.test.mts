@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { asn1parse, getDERTLVList, getLh, getTLVh, getVh, getTh, hextooid, isDER, lenhextoint } from "./index.mts";
+import { asn1parse, getDERTLVList, getLh, getTLVh, getVh, getTh, hextooid, isDER, lenhextoint, dig } from "./index.mts";
 
 test("getLh", () => {
   expect(getLh("020100", 0)).toBe("01");
@@ -82,3 +82,33 @@ test("hextooid", () => {
   expect(hextooid("550406")).toBe("2.5.4.6");
 });
 
+describe("dig", () => {
+  test("basic test", () => {
+    expect(dig({t:"seq", v:[]}, "seq")).toEqual([]);
+    expect(dig({t:"seq", v:[{t:"int", v:"0102"}]}, "seq")).toEqual([{t:"int", v:"0102"}]);
+    expect(dig({t:"seq", v:[{t:"int", v:"0102"}]}, "seq.0")).toEqual({t:"int", v:"0102"});
+    expect(dig({t:"seq", v:[{t:"int", v:"01"},{t:"int", v:"02"}]}, "seq.1")).toEqual({t:"int", v:"02"});
+  });
+  test("PKCS8 E256 private key", () => {
+    const p = asn1parse(PRV8E256HEX);
+    expect(dig(p, "seq.0")).toEqual({t:"int", v:"00"});
+    expect(dig(p, "seq.1.seq.0.oid")).toEqual({oid: "ecPublicKey"});
+    expect(dig(p, "seq.1.seq.1.oid")).toEqual({oid: "prime256v1"});
+    expect(dig(p, "seq.1.seq.5.oid")).toBe(undefined);
+    expect(dig(p, "int")).toBe(undefined);
+  });
+  test("PKCS8 E256 public key", () => {
+    const p = asn1parse(PUB8E256HEX);
+    expect(dig(p, "seq.0.seq.0.oid")).toEqual({oid: "ecPublicKey"});
+    expect(dig(p, "seq.0.seq.1.oid")).toEqual({oid: "prime256v1"});
+    expect(dig(p, "seq.1.seq.6.oid")).toBe(undefined);
+    expect(dig(p, "utf8str")).toBe(undefined);
+    expect(dig(p, "utf8str", null)).toBe(null);
+  });
+});
+
+// rfc9500testkey/testecp256.prv.p8p.der > hex
+const PRV8E256HEX = "308187020100301306072a8648ce3d020106082a8648ce3d030107046d306b0201010420e6cb5bdd80aa45ae9c95e8c15476679ffec953c16851e711e743939589c64fc1a14403420004422548f88fb782ffb5eca3744452c72a1e558fbd6f73be5e48e93232cc45c5b16c4cd10c4cb8d5b8a17139e94882c8992572993425f41419ab7e90a42a494272";
+
+// rfc9500testkey/testecp256.pub.p8.der > hex
+const PUB8E256HEX = "3059301306072a8648ce3d020106082a8648ce3d03010703420004422548f88fb782ffb5eca3744452c72a1e558fbd6f73be5e48e93232cc45c5b16c4cd10c4cb8d5b8a17139e94882c8992572993425f41419ab7e90a42a494272";
