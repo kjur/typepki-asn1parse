@@ -1,5 +1,9 @@
 # ChangeLog
 
+## [0.4.0] - 2024-05-22
+
+- function asn1oidcanon added
+
 ## [0.3.0] - 2024-05-22
 
 - function dig added

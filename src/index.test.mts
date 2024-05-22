@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { asn1parse, getDERTLVList, getLh, getTLVh, getVh, getTh, hextooid, isDER, lenhextoint, dig } from "./index.mts";
+import { asn1parse, getDERTLVList, getLh, getTLVh, getVh, getTh, hextooid, isDER, lenhextoint, dig, asn1oidcanon } from "./index.mts";
 
 test("getLh", () => {
   expect(getLh("020100", 0)).toBe("01");
@@ -112,3 +112,14 @@ const PRV8E256HEX = "308187020100301306072a8648ce3d020106082a8648ce3d030107046d3
 
 // rfc9500testkey/testecp256.pub.p8.der > hex
 const PUB8E256HEX = "3059301306072a8648ce3d020106082a8648ce3d03010703420004422548f88fb782ffb5eca3744452c72a1e558fbd6f73be5e48e93232cc45c5b16c4cd10c4cb8d5b8a17139e94882c8992572993425f41419ab7e90a42a494272";
+
+test("asn1oidcanon", () => {
+  expect(asn1oidcanon({oid: "P-256"})).toBe("1.2.840.10045.3.1.7");
+  expect(asn1oidcanon({oid: "prime256v1"})).toBe("1.2.840.10045.3.1.7");
+  expect(asn1oidcanon({oid: "P-384"})).toBe("1.3.132.0.34");
+  expect(asn1oidcanon({oid: "secp384r1"})).toBe("1.3.132.0.34");
+  expect(asn1oidcanon({oid: "P-521"})).toBe("1.3.132.0.35");
+  expect(asn1oidcanon({oid: "secp521r1"})).toBe("1.3.132.0.35");
+  expect(asn1oidcanon({oid: "ecPublicKey"})).toBe("1.2.840.10045.2.1");
+  expect(asn1oidcanon({oid: "1.2.3.4"})).toBe("1.2.3.4");
+});

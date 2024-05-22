@@ -305,3 +305,20 @@ function dig_isstructtag(key: string): boolean {
   if (key.slice(0, 1) === "a") return true;
   return false;
 }
+
+// == canonicalizer ============
+/**
+ * canonicalize parsed ASN.1 ObjectIdentifier value to oid numbers
+ * @param pValue - parsed ASN.1 value of ObjectIdentifier
+ * @return a string of ObjectIdentifier value (ex. "1.2.3.4")
+ * @see [OIDDataBase.nametooid](https://kjur.github.io/typepki-oiddb/classes/OIDDataBase.html#nametooid)
+ * @example
+ * asn1oidcanon({oid: "P-256"}) -> "1.2840.10045.3.1.7"
+ * asn1oidcanon{{oid: "prime256v1"}) -> "1.2840.10045.3.1.7"
+ * asn1oidcanon({oid: "ecPublicKey"}) -> "1.2.840.10045.2.1"
+ * asn1oidcanon({oid: "1.2.3.4"}) -> "1.2.3.4"
+ */
+export function asn1oidcanon(pValue: Record<string, string>): string {
+  if (pValue.oid.match(/^[0-9.]+$/)) return pValue.oid;
+  return oiddb.nametooid(pValue.oid);
+}
