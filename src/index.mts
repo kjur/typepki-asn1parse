@@ -1,12 +1,29 @@
-import { ishex, strpad, hextouricmp, hextoutf8 } from "typepki-strconv";
+import { ishex, hexpad, hextouricmp, hextoutf8, strpad  } from "typepki-strconv";
 import { OIDDataBase, OIDSET_CRYPTO, OIDSET_X509 } from "typepki-oiddb";
 
 const oiddb = OIDDataBase.instance;
 oiddb.regist([OIDSET_CRYPTO, OIDSET_X509]);
 
 /**
+ * ASN.1 parsing option
+ * @description
+ * Optional parameters for {@link asn1parse}
+ */ 
+export interface ASN1ParseOption {
+  /**
+   * specifies how far the depth number of ASN.1 structure will be parsed.
+   */
+  maxDepth?: number;
+  /**
+   * member "tlv" of ASN.1 TLV hexadecimal also concluded or not
+   */
+  withTLV?: true;
+}
+
+/**
  * parse ASN.1 hexadecimal string
  * @param h - ASN.1 hexadecimal string
+ * @param opt - optional ASN.1 parsing opiton
  * @return parsed ASN.1 as Record object
  * @example
  * asn1parse("300602010a02010b") -> {
@@ -17,20 +34,45 @@ oiddb.regist([OIDSET_CRYPTO, OIDSET_X509]);
  *  ]
  * }
  */
-export function asn1parse(h: string): Record<string, any> {
+export function asn1parse(
+  h: string,
+  opt?: ASN1ParseOption
+): Record<string, any> {
+  let maxDepth: number = -1;
+  if (opt != undefined && "maxDepth" in opt) {
+    maxDepth = opt.maxDepth as number;
+  }
+  const _opt = (opt != undefined) ? opt : {};
+  return _asn1parse(h, 1, maxDepth, _opt);
+}
+
+function _asn1parse(
+  h: string,
+  currentDepth: number,
+  maxDepth: number,
+  opt: ASN1ParseOption
+): Record<string, any> {
   let p: Record<string, any> = {};
   const hT = getTh(h, 0);
   const tag = taghextos(hT);
   const hL = getLh(h, 0);
   const iL = lenhextoint(hL);
   let value: string | Record<string, any> = getVh(h, 0);
+
+  if (maxDepth != -1 && currentDepth >= maxDepth) {
+    value = { "hex": value };
+    let result: Record<string, any> = { t: tag, v: value };
+    if (opt.withTLV === true) result.tlv = h;
+    return result;
+  }
+
   if (["seq", "set", "a0", "a3"].includes(tag)) {
     const aList = getDERTLVList(h, hT.length + hL.length, iL * 2);
-    value = aList.map((hItem) => asn1parse(hItem));
+    value = aList.map((hItem) => _asn1parse(hItem, currentDepth + 1, maxDepth, opt));
   }
   if (["octstr"].includes(tag) && isDER(h)) {
     try {
-      value = { "asn": asn1parse(value as string) };
+      value = { "asn": _asn1parse(value as string, currentDepth + 1, maxDepth, opt) };
     } catch (ex) {
       value = { "hex": value };
     }
@@ -65,10 +107,9 @@ export function asn1parse(h: string): Record<string, any> {
     }
   }
 
-  return {
-    t: tag,
-    v: value
-  };
+  let result: Record<string, any> = { t: tag, v: value };
+  if (opt.withTLV === true) result.tlv = h;
+  return result;
 }
 
 function oidtoname(oid: string): string {
@@ -93,6 +134,15 @@ export function taghextos(h: string): string {
   return h;
 }
 
+/**
+ * get ASN.1 object TLV hexadecimal string at specified string index
+ * @param h - string supposed to be a ASN.1 TLV hexadecimal at specified index
+ * @parma sidx - string index of ASN.1 TLV hexadecimal
+ * @return ASN.1 TLV hexadecimal string
+ * @example
+ * getTLVh("zzz0201fazzz", 3) -> "0201fa"
+ * getTLVh("zzz0202fa0czzz", 3) -> "0202fa0c"
+ */
 export function getTLVh(h: string, sidx: number): string {
   const hT = getTh(h, sidx);
   const hL = getLh(h, sidx);
@@ -100,6 +150,15 @@ export function getTLVh(h: string, sidx: number): string {
   return `${hT}${hL}${hV}`;
 }
 
+/**
+ * get ASN.1 object T(tag) hexadecimal string at specified string index
+ * @param h - string supposed to be a ASN.1 TLV hexadecimal at specified index
+ * @parma sidx - string index of ASN.1 TLV hexadecimal
+ * @return ASN.1 T(tag) hexadecimal string
+ * @example
+ * getTLVh("zzz0201fazzz", 3) -> "02"
+ * getTLVh("zzzzz0202fa0czzz", 5) -> "02"
+ */
 export function getTh(h: string, sidx: number): string {
   return h.slice(sidx, sidx + 2);
 }
@@ -131,6 +190,25 @@ export function getLh(h: string, sidx: number): string {
   }
 }
 
+// === lenhex / int =======================================
+
+/**
+ * convert ASN.1 TLV length octet to ASN.1 length value
+ * @param hL - hexadecimal string of ASN.1 length octet
+ * @return ASN.1 length value. For ASN.1 BER indefinite length (i.e. "80"), returns -1
+ * @see {@link inttolenhex}
+ *
+ * @description
+ * This function converts an ASN.1 TLV length octet to ASN.1 TLV length value.
+ * When the input is "80" which means ASN.1 BER indefinite length, it returns a
+ * special value -1.
+ *
+ * @example
+ * lenhextoint("10") -> 16
+ * lenhextoint("81ff") -> 256
+ * lenhextoint("80") -> -1 // indefinite length
+ * lenhextoint("82047b") -> 1147
+ */
 export function lenhextoint(hL: string): number {
   if (hL === "80") return -1;
   const iL0 = Number.parseInt(hL.slice(0, 2), 16);
@@ -141,6 +219,44 @@ export function lenhextoint(hL: string): number {
   return Number.parseInt(hL.slice(2), 16);
 }
 
+/**
+ * convert ASN.1 length value to ASN.1 TLV length octet
+ * @param n - ASN.1 length value. 
+ * @return an hexadecimal string of ASN.1 length octet. For ASN.1 BER indefinite length -1, returns "80"
+ * @see {@link lenhextoint}
+ *
+ * @description
+ * This function converts an ASN.1 TLV length value to an ASN.1 TLV length octet.
+ * When the input is -1  which means ASN.1 BER indefinite length, it returns "80".
+ *
+ * @example
+ * inttolenhex(16) -> "10"
+ * inttolenhex(256) -> "81ff"
+ * inttolenhex(-1) -> "80"
+ * inttolenhex(1147) -> "82047b"
+ */
+export function inttolenhex(n: number): string {
+  if (n == -1) return "80"; // indefinite length
+  if (n < 0) throw new Error(`n shall be non negative except indefinite length: n=${n}`);
+  if (n < 128) {
+    const hex = n.toString(16);
+    return (hex.length % 2 == 0) ? hex : `0${hex}`;
+  }
+  let hex = hexpad(n.toString(16));
+  let numoctet = hex.length / 2;
+  if (numoctet > 127) throw new Error(`too large for ASN.1 Length: num octet=${numoctet}`);
+  let hHead = (128 + numoctet).toString(16);
+  return `${hHead}${hex}`;
+}
+
+/**
+ * get ASN.1 value octet hexadecimal string at specified ASN.1 TLV string index
+ * @param h - string at specified index supposed to be ASN.1 TLV string
+ * @param sidx - string index of ASN.1 TLV
+ * @return ASN.1 value octet hexadecimal string
+ * @example
+ * getVh("zzz0203abcdef", 3) -> "abcdef"
+ */
 export function getVh(h: string, sidx: number): string {
   const hL = getLh(h, sidx);
   const iL = lenhextoint(hL);

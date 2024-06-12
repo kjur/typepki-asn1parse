@@ -1,6 +1,6 @@
 {
   "name": "typepki-asn1parse",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "author": "Kenji Urushima <kenji.urushima@gmail.com>",
   "description": "ASN.1 parser utility for TypePKI library (beta)",
   "homepage": "https://kjur.github.io/typepki-asn1parse",
@@ -12,12 +12,12 @@
     "url": "https://github.com/kjur/typepki-asn1parse/issues"
   },
   "keywords": [
-    "cryptography",
-    "webcryptoapi",
-    "publickey",
-    "hash",
-    "kdf",
-    "hmac"
+    "asn1",
+    "x680",
+    "x690",
+    "der",
+    "ber",
+    "parser"
   ],
   "license": "MIT",
   "scripts": {
@@ -68,6 +68,6 @@
   },
   "dependencies": {
     "typepki-oiddb": "^0.2.0",
-    "typepki-strconv": "^0.5.0"
+    "typepki-strconv": "^0.6.0"
   }
 }
