@@ -1,5 +1,11 @@
 # ChangeLog
 
+## [0.6.1] - 2024-06-16
+
+### Changed
+
+- asn1parse supports structured context specific tag like a0, a1...
+
 ## [0.6.0] - 2024-06-13
 
 ### Added
