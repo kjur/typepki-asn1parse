@@ -179,3 +179,105 @@ describe("asn1parse withTLV", () => {
     });
   });
 });
+
+describe("asn1parse RSAPSS AlgorithmIdentifier", () => {
+  test("rsaPSS 256 256 32", () => {
+    expect(asn1parse(hAlgIdPSS256)).toEqual(pAlgIdPSS256);
+  });
+  test("rsaPSS 512 512 64", () => {
+    expect(asn1parse(hAlgIdPSS512)).toEqual(pAlgIdPSS512);
+  });
+});
+
+// AlgorithmIdentifier rsaPSS hash=sha256, mgf1=sha256, salt=32
+const hAlgIdPSS256 = "304106092a864886f70d01010a3034a00f300d06096086480165030402010500a11c301a06092a864886f70d010108300d06096086480165030402010500a203020120";
+const pAlgIdPSS256 = {
+  t: "seq",
+  v: [{
+    t: "oid", v: { oid: "rsaPSS" }
+  },{
+    t: "seq",
+    v: [{
+      t: "a0",
+      v: [{
+        t: "seq",
+        v: [
+          { t: "oid", v: { "oid": "sha256" } },
+          { t: "null", v: "" },
+        ]
+      }]
+    },{
+      t: "a1",
+      v: [{
+        t: "seq",
+        v: [{
+          t: "oid", v: { oid: "mgf1" }
+        },{
+          t: "seq",
+          v: [
+            { t: "oid", v: { "oid": "sha256" } },
+            { t: "null", v: "" }
+          ]
+        }]
+      }]
+    },{
+      t: "a2",
+      v: [{ t: "int", v: "20" }]
+    }]
+  }]
+};
+
+// AlgorithmIdentifier rsaPSS hash=sha512, mgf1=sha512, salt=64
+const hAlgIdPSS512 = "304106092a864886f70d01010a3034a00f300d06096086480165030402030500a11c301a06092a864886f70d010108300d06096086480165030402030500a203020140";
+const pAlgIdPSS512 = {
+  t: "seq",
+  v: [{
+    t: "oid", v: { oid: "rsaPSS" }
+  },{
+    t: "seq",
+    v: [{
+      t: "a0",
+      v: [{
+        t: "seq",
+        v: [
+          { t: "oid", v: { "oid": "sha512" } },
+          { t: "null", v: "" },
+        ]
+      }]
+    },{
+      t: "a1",
+      v: [{
+        t: "seq",
+        v: [{
+          t: "oid", v: { oid: "mgf1" }
+        },{
+          t: "seq",
+          v: [
+            { t: "oid", v: { "oid": "sha512" } },
+            { t: "null", v: "" }
+          ]
+        }]
+      }]
+    },{
+      t: "a2",
+      v: [{ t: "int", v: "40" }]
+    }]
+  }]
+};
+/*
+SEQUENCE
+  ObjectIdentifier rsaPSS (1 2 840 113549 1 1 10)
+  SEQUENCE
+    [0]
+      SEQUENCE
+        ObjectIdentifier sha512 (2 16 840 1 101 3 4 2 3)
+        NULL
+    [1]
+      SEQUENCE
+        ObjectIdentifier pkcs1-MGF (1 2 840 113549 1 1 8)
+        SEQUENCE
+          ObjectIdentifier sha512 (2 16 840 1 101 3 4 2 3)
+          NULL
+    [2]
+      INTEGER 40
+ */

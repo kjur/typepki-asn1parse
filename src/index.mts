@@ -66,7 +66,7 @@ function _asn1parse(
     return result;
   }
 
-  if (["seq", "set", "a0", "a3"].includes(tag)) {
+  if (["seq", "set"].includes(tag) || tag.match(/^a\d$/)) {
     const aList = getDERTLVList(h, hT.length + hL.length, iL * 2);
     value = aList.map((hItem) => _asn1parse(hItem, currentDepth + 1, maxDepth, opt));
   }
