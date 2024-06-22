@@ -117,10 +117,19 @@ test("asn1oidcanon", () => {
   expect(asn1oidcanon({oid: "1.2.3.4"})).toBe("1.2.3.4");
 });
 
+test("asn1parse string primitives", () => {
+  expect(asn1parse("0c0431323334")).toEqual({t:"utf8str", v:{str:"1234"}});
+  expect(asn1parse("120431323334")).toEqual({t:"numstr", v:{str:"1234"}});
+  expect(asn1parse("130431323334")).toEqual({t:"prnstr", v:{str:"1234"}});
+  expect(asn1parse("160431323334")).toEqual({t:"ia5str", v:{str:"1234"}});
+  expect(asn1parse("1a0431323334")).toEqual({t:"visstr", v:{str:"1234"}});
+  expect(asn1parse("1c0431323334")).toEqual({t:"unistr", v:{str:"1234"}});
+  expect(asn1parse("13025553")).toEqual({t:"prnstr",v:{str:"US"}});
+});
+
 test("asn1parse", () => {
   expect(asn1parse("020101")).toEqual({t:"int",v:"01"});
   expect(asn1parse("06092a864886f70d01010b")).toEqual({t:"oid",v:{oid:"sha256WithRSAEncryption"}});
-  expect(asn1parse("13025553")).toEqual({t:"prnstr",v:{str:"US"}});
   expect(asn1parse("170d3234303431313138303234345a")).toEqual({t:"utctime",v:"240411180244Z"});
   expect(asn1parse("300902010a02010b02010c")).toEqual({
     t: "seq",

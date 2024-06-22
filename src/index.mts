@@ -77,7 +77,7 @@ function _asn1parse(
       value = { "hex": value };
     }
   }
-  if (["prnstr"].includes(tag)) {
+  if (["prnstr", "ia5str", "utf8str", "visstr", "unistr", "numstr"].includes(tag)) {
     try {
       value = { "str": hextoutf8(value as string) };
     } catch (ex) {
@@ -125,10 +125,19 @@ export function taghextos(h: string): string {
   if (h === "06") return "oid";
   if (h === "0a") return "enum";
   if (h === "0c") return "utf8str";
+  if (h === "12") return "numstr";
   if (h === "13") return "prnstr";
+  if (h === "14") return "telstr";
+  if (h === "15") return "vidstr";
   if (h === "16") return "ia5str";
   if (h === "17") return "utctime";
   if (h === "18") return "gentime";
+  if (h === "19") return "grastr";
+  if (h === "1a") return "visstr";
+  if (h === "1b") return "genstr";
+  if (h === "1c") return "unistr";
+  if (h === "1d") return "chrstr";
+  if (h === "1e") return "bmpstr";
   if (h === "30") return "seq";
   if (h === "31") return "set";
   return h;
