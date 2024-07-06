@@ -112,8 +112,8 @@ function _asn1parse(
   return result;
 }
 
-function oidtoname(oid: string): string {
-  return oiddb.oidtoname(oid);
+function oidtoname(oid: string, useUndef?: boolean): string | undefined {
+  return oiddb.oidtoname(oid, useUndef);
 }
 
 export function taghextos(h: string): string {
