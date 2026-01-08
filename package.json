@@ -1,6 +1,6 @@
 {
   "name": "typepki-asn1parse",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "author": "Kenji Urushima <kenji.urushima@gmail.com>",
   "description": "ASN.1 parser utility for TypePKI library (beta)",
   "homepage": "https://kjur.github.io/typepki-asn1parse",
@@ -67,7 +67,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "typepki-oiddb": "^0.4.0",
+    "typepki-oiddb": "^0.4.1",
     "typepki-strconv": "^0.6.0"
   }
 }

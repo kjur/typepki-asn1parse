@@ -1,3 +1,4 @@
+export const VERSION: string = "typepki-asn1parse 0.8.0 kjur.github.io/typepki-asn1parse";
 import { ishex, hexpad, hextouricmp, hextoutf8, strpad  } from "typepki-strconv";
 import { OIDDataBase, OIDSET_CRYPTO, OIDSET_X509 } from "typepki-oiddb";
 
@@ -24,7 +25,7 @@ export interface ASN1ParseOption {
  * parse ASN.1 hexadecimal string
  * @param h - ASN.1 hexadecimal string
  * @param opt - optional ASN.1 parsing opiton
- * @return parsed ASN.1 as Record object
+ * @return parsed ASN.1 as ASN1Object object
  * @example
  * asn1parse("300602010a02010b") -> {
  *  t: "seq",
@@ -37,7 +38,7 @@ export interface ASN1ParseOption {
 export function asn1parse(
   h: string,
   opt?: ASN1ParseOption
-): Record<string, any> {
+): ASN1Object {
   let maxDepth: number = -1;
   if (opt != undefined && "maxDepth" in opt) {
     maxDepth = opt.maxDepth as number;
@@ -51,37 +52,37 @@ function _asn1parse(
   currentDepth: number,
   maxDepth: number,
   opt: ASN1ParseOption
-): Record<string, any> {
-  let p: Record<string, any> = {};
+): ASN1Object {
+  let p: ASN1Object;
   const hT = getTh(h, 0);
   const tag = taghextos(hT);
   const hL = getLh(h, 0);
   const iL = lenhextoint(hL);
-  let value: string | Record<string, any> = getVh(h, 0);
+  let value: ASN1Value = getVh(h, 0);
 
   if (maxDepth != -1 && currentDepth >= maxDepth) {
     value = { "hex": value };
-    let result: Record<string, any> = { t: tag, v: value };
+    let result: ASN1Object = { t: tag, v: value };
     if (opt.withTLV === true) result.tlv = h;
     return result;
   }
 
   if (["seq", "set"].includes(tag) || tag.match(/^a\d$/)) {
-    const aList = getDERTLVList(h, hT.length + hL.length, iL * 2);
+    const aList: string[] = getDERTLVList(h, hT.length + hL.length, iL * 2);
     value = aList.map((hItem) => _asn1parse(hItem, currentDepth + 1, maxDepth, opt));
   }
   if (["octstr"].includes(tag) && isDER(h)) {
     try {
       value = { "asn": _asn1parse(value as string, currentDepth + 1, maxDepth, opt) };
     } catch (ex) {
-      value = { "hex": value };
+      value = { "hex": value as string };
     }
   }
   if (["prnstr", "ia5str", "utf8str", "visstr", "unistr", "numstr"].includes(tag)) {
     try {
       value = { "str": hextoutf8(value as string) };
     } catch (ex) {
-      value = { "hex": value };
+      value = { "hex": value as string };
     }
   }
   if (["oid"].includes(tag)) {
@@ -89,25 +90,25 @@ function _asn1parse(
       const oid = oidtoname(hextooid(value as string));
       value = { "oid": oid };
     } catch (ex) {
-      value = { "hex": value };
+      value = { "hex": value as string };
     }
   }
   if (["utctime", "gentime"].includes(tag)) {
     try {
       value = hextoutf8(value as string);
     } catch (ex) {
-      value = { "hex": value };
+      value = { "hex": value as string };
     }
   }
   if (tag.slice(0, 1) == "8") {
     try {
       value = { str: hextoutf8(value as string) };
     } catch (ex) {
-      value = { "hex": value };
+      value = { "hex": value as string };
     }
   }
 
-  let result: Record<string, any> = { t: tag, v: value };
+  let result: ASN1Object = { t: tag, v: value };
   if (opt.withTLV === true) result.tlv = h;
   return result;
 }
@@ -387,7 +388,7 @@ export function hextooid(h: string): string {
  * dig(parsedASN, "seq.1.seq.0.utf8str") -> {str: "test"}
  * dig(parsedASN, "utctime", null) -> null // not found
  */
-export function dig(pASN: Record<string, any>, key: string, defaultValue?: any): string | Record<string, any> {
+export function dig(pASN: ASN1Object, key: string, defaultValue?: any): ASN1Value | ASN1Object {
   const aKey: string[] = key.split(".");
   try {
     return dig_value(pASN, aKey, defaultValue);
@@ -397,24 +398,55 @@ export function dig(pASN: Record<string, any>, key: string, defaultValue?: any):
   }
 }
 
-function dig_value(pASN: Record<string, any>, aKey: string[], defaultValue?: any): string | Record<string, any> | Record<string, any>[] {
+/*
+ * get value for specified array of keys from parsed ASN.1
+ * @param pASN - JSON structure of parsed ASN.1
+ * @param aKey - array of keys
+ * @param defaultValue - default value if not found
+ * @retun object refered by keys
+ * @description
+ * 
+ * @example
+ * dig_value(
+ *   {
+ *     t: "seq",
+ *     v: [ ... ]
+ *   },
+ *   [ "seq", "0" ]
+ * ) -> { "octstr": { "hex": "abcd1234" } }
+ */
+function dig_value(pASN: ASN1Object, aKey: string[], defaultValue?: any): ASN1Value | ASN1Object {
   if (aKey.length == 0) return pASN;
   const key0: string | undefined = aKey.shift();
   if (key0 === undefined) return defaultValue;
   if (pASN.t !== key0) return defaultValue;
-  if (dig_isstructtag(key0)) return dig_list(pASN.v, aKey, defaultValue);
+  if (dig_isstructtag(key0)) return dig_list(pASN.v as ASN1Object[], aKey, defaultValue);
   return pASN.v;
 }
 
-function dig_list(aASN: Record<string, any>[], aKey: string[], defaultValue?: any): string | Record<string, any> | Record<string, any>[] {
+/*
+ * 
+ */
+function dig_list(aASN: ASN1Object[], aKey: string[], defaultValue?: any): ASN1Value | ASN1Object {
   if (aKey.length == 0) return aASN;
   const key0: string | undefined = aKey.shift();
   if (key0 === undefined) return defaultValue;
-  try {
+
+  if (key0.match(/^[8a][0-9]$/)) { // application tag "a0", "81"...
+    //console.log("key0=", key0);
+    for (let i = 0; i < aASN.length; i++) {
+      const iASN = aASN[i];
+      //console.log("i=", i, " iASN=", JSON.stringify(iASN));
+      if (iASN.t === key0) {
+        //console.log("***found*** i=", i, "iASN=", JSON.stringify(iASN));
+        return dig_value(iASN.v as ASN1Object, aKey, defaultValue);
+      }
+    }
+    return defaultValue;
+  }
+  if (key0.match(/^\d+$/)) { // structure element index "0", "1"...
     const ikey0 = parseInt(key0);
     return dig_value(aASN[ikey0], aKey, defaultValue);
-  } catch (ex) {
-    //console.log(ex);
   }
   return defaultValue;
 }
@@ -425,6 +457,15 @@ function dig_istag(key: string): boolean {
 }
  */
 
+/*
+ * check if key is structure tag or not
+ * @param key - ASN.1 tag string (ex. "seq", "set", "a1", "int", "81" "octstr" et al.)
+ * @return true if key is a structured tag
+ * @example
+ * dig_isstructtag("set") -> true
+ * dig_isstructtag("a0") -> true
+ * dig_isstructtag("octstr") -> false
+ */
 function dig_isstructtag(key: string): boolean {
   if (["seq", "set"].includes(key)) return true;
   if (key.slice(0, 1) === "a") return true;
@@ -447,3 +488,70 @@ export function asn1oidcanon(pValue: Record<string, string>): string {
   if (pValue.oid.match(/^[0-9.]+$/)) return pValue.oid;
   return oiddb.nametooid(pValue.oid);
 }
+
+// ==junk===================================
+/**
+ * object for parsed ASN.1
+ * @since 0.8.0
+ */
+export interface ASN1Object {
+  /**
+   * ASN.1 tag
+   */
+  t: string;
+  /**
+   * ASN.1 value
+   */
+  v: ASN1Value;
+  /**
+   * hexadecimal encoded string for this ASN.1 object
+   */
+  tlv?: string;
+}
+
+/**
+ * possible ASN.1 value in ASN1Object
+ */
+export type ASN1Value = ASN1ValuePrimitive | ASN1Object[] | string;
+
+/**
+ * ASN.1 value for ASN.1 primitives not constructed type
+ */
+export interface ASN1ValuePrimitive {
+  /**
+   * ASN.1 value by hexadecimal string
+   */
+  hex?: string;
+  /**
+   * ASN.1 value by string
+   */
+  str?: string;
+  /**
+   * ASN.1 object identifier value by string
+   */
+  oid?: string;
+  /**
+   * ASN.1 value by TLV hexadecimal string
+   */
+  asn?: ASN1Object;
+}
+
+/*
+function getBSN(): string {
+  const o: ASN1Object = {
+    t: "oid",
+    v: { hex: "abcd" },
+    tlv: "abcd"
+  };
+  const o2: ASN1Object = {
+    t: "oid",
+    v: "aaa"
+  };
+  const o3: ASN1Object = {
+    t: "oid",
+    v: [{t:"int",v:"123"},{t:"int",v:{hex:"abab"}}]
+  };
+  return "aaa";
+};
+ */
+

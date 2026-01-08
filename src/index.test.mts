@@ -143,6 +143,17 @@ test("asn1parse", () => {
   //expect(asn1parse("3081dc020101044201d924dcca0a887f8d99767a37d874e637a12ccb477d6e08665356694d68b7655e5069638fde7b45c854013dc77a35b18655b84c966a60220d40f91ed9f5145802eaa00706052b81040023a18189038186000401d0fd7257a84c747f562575c07385dbebf2f52bea58083db82fdd1531d8aae3cc875ff02ff7fa2da260d8eb62d6d2f5d649278e321736a0628cbbb30308b6e618db00f62ad204c6460359bc818ab8961bf0f0fc0ec5aae8a428173ce56f00de9b157c1e5c82c64f562fcadefc4a4c28f6d342cf3ef616fc82d33b7285c921f2bf36fdd8")).toEqual({t:"seq",v:"01"});
 });
 
+test("aaa", () => {
+  const p = asn1parse("30098001aa8101bb8201cc");
+  //console.log("dig=", JSON.stringify(dig(p, "seq.81"), null, 2));
+  //console.log("p=", JSON.stringify(p, null, 2));
+  expect(dig(p, "seq.80")).toEqual({hex: "aa"});
+  expect(dig(p, "seq.81")).toEqual({hex: "bb"});
+  expect(dig(p, "seq.82")).toEqual({hex: "cc"});
+});
+
+
+
 describe("asn1parse explicit depth", () => {
   test("depth = -1", () => {
     expect(asn1parse("300d300602010a02010b310302010c", { maxDepth: -1 })).toEqual({
